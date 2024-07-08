@@ -1,6 +1,5 @@
 # Dynamic-Fluctuations-in-DMN-network-after-TBS
 
-Spectral DCM for resting-state EEG afte cTBS, iTBS and sham
 
 Steps:
 1. semi-automated ICA for artifact rejection with EEGLAB
