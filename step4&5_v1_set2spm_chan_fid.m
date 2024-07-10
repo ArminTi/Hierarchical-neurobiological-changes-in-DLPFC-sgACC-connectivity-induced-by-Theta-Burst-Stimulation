@@ -4,7 +4,7 @@
 clear all;
 close all;
 clc;
-%run feildtrip (it was recomended to not be directly addsed to paths)
+%run feildtrip (it is recomended to not be directly add to perminant paths)
 original_path = path;
 addpath('C:/Users/Growth fire/Programs/Matlab plugins/fieldtrip-20240620/fieldtrip-20240620');
 ft_defaults;
@@ -137,5 +137,4 @@ for i = 1:length(pre_files)
  
 end
 restoredefaultpath;
-path(original_path);
 path(original_path);
