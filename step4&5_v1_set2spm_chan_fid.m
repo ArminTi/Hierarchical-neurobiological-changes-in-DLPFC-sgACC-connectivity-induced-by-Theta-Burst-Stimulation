@@ -136,4 +136,6 @@ for i = 1:length(pre_files)
 %-------------------------------the previous step is not necessary
  
 end
+restoredefaultpath;
+path(original_path);
 path(original_path);
