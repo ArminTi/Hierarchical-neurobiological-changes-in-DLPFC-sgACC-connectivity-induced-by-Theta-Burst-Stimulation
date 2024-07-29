@@ -2,7 +2,7 @@
 
 ### Steps:
 
-1. semi-automated ICA for artifact rejection with EEGLAB (B.A)
+1. semi-automated ICA for artifact rejection with EEGLAB (B.A, F.A)
 2. Focusing on 10 second before stimulation and three 10 secondes after stimulation (H.M)
 3. t-map for each stimulation condition on theta, alpha and beta range (H.M)
 4. Convert .set file to spm object (G.G)
