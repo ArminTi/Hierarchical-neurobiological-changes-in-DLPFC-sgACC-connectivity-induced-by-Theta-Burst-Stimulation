@@ -2,11 +2,11 @@
 
 ### Steps:
 
-1. semi-automated ICA for artifact rejection with EEGLAB (B.A, F.A)
+1. Semi-automated ICA for artifact rejection with EEGLAB (B.A, F.A)
 2. Focusing on 10 second before stimulation and three 10 secondes after stimulation (H.M)
 3. t-map for each stimulation condition on theta, alpha and beta range (H.M)
 4. Convert .set file to spm object (G.G)
-5. add real time channel location and fids (G.G)
+5. Add real time channel location and fids (G.G)
 6. Source recounstruction with each individual MRI data (G.G)
 7. Performing spectral DCM with Sliding Window Approach (Van de steen, 2019, 2021) (G.G)
 8. Group level analysis with parametric empirical bayes (PEB) 
