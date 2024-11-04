@@ -1,19 +1,31 @@
-# Dynamic-Fluctuations-in-DMN-network-after-TBS
+# Computational analysis of longitudinal electroencephalograms after theta burst stimulation over left DLPFC using hierarchical dynamic causal modelling.
 
-### Steps:
+## Steps:
 
-1. Semi-automated ICA for artifact rejection with EEGLAB (B.A, F.A)
-2. Focusing on 10 second before stimulation and three 10 secondes after stimulation (H.M)
-3. t-map for each stimulation condition on theta, alpha and beta range (H.M)
-4. Convert .set file to spm object (G.G)
-5. Add real time channel location and fids (G.G)
-6. Source recounstruction with each individual MRI data (G.G)
-7. Performing spectral DCM with Sliding Window Approach (Van de steen, 2019, 2021) (G.G)
-8. Group level analysis with parametric empirical bayes (PEB) 
+### Data Preprocessing
+1. using individual channel locs
+2. Bad channel removal
+3. ICA with runica
+4. RV with DIPFIT
+5. Reject components with less than 70% prob of being brain or RV more than 0.15
+6.  Epoching data in 2 sec
+7.  STFT applied to each epoch (1-50 hz)
+8.  Epochs with a Z-score of more than three standard deviations were discarded
 
+### Data Analysis
 
-
+1. Loading data to SPM using fieldtrip conversion
+2. Source localization: using individual MRI and real-time chanel locs
+3. Model specification: spectral DCM, Conductance-based Canonical Microcircuit Model (cmm-NMDA)
+4. Model estimation
+5. Explained Variance: More than 95 is desirable
+6. Model Selection: Using model variation and selecting the best model with free energy criteria
+7. First Level Parametric empirical bayes
+8. Peb of Peb: The influence of TMS protocols on connectivity parameters
+9. Cross-Validation
 -------------------------------------------------------------------------------------------------
-Reference
+IDS team 23:
+Supervisor: Prof. Ali Motie Nasrabadi
+Mentor: Armin Toghi
+Members: Ghazale ghaffaripour, Hamed moghtaderi, Babak Aliyari
 
-Van de Steen F, Almgren H, Razi A, Friston K, Marinazzo D. Dynamic causal modelling of fluctuating connectivity in resting-state EEG. Neuroimage. 2019 Apr 1;189:476-484. doi: 10.1016/j.neuroimage.2019.01.055. Epub 2019 Jan 26. PMID: 30690158; PMCID: PMC6435216.
