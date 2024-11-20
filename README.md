@@ -3,14 +3,16 @@
 ## Steps:
 
 ### Data Preprocessing
-1. using individual channel locs
-2. Bad channel removal
-3. ICA with runica
-4. RV with DIPFIT
-5. Reject components with less than 70% prob of being brain or RV more than 0.15
-6.  Epoching data in 2 sec
-7.  STFT applied to each epoch (1-50 hz)
-8.  Epochs with a Z-score of more than three standard deviations were discarded
+1. Specifying rest eeg trials (remove TEP epochs)
+2. BandPass (1 - 50) and downsample to 258 (see tbs_rseeg_preprocess)
+3. 2 second epoch for each trial (trial 1: Res Pre 1, trial 2: Rest pre 2, trial 3: Rest post 1, trial 4: Rest post 2, trial 5: Rest post 3)
+4. Auto rejection of badepochs (see tbs_rseeg_trialrejection function)
+5. Manual rejection of trials and epochs (see tbs_rseeg_cleaning)
+6. ICA using runica
+7. inspection of ICA (Auto labeling with manual rejection)
+8. Rerefrence to average
+9. Final inspection
+10. change fieldtrip to spm (save spm object)
 
 ### Data Analysis
 
