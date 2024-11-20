@@ -25,6 +25,7 @@
 7. First Level Parametric empirical bayes
 8. Peb of Peb: The influence of TMS protocols on connectivity parameters
 9. Cross-Validation
+    
 -------------------------------------------------------------------------------------------------
 IDS team 23:
 Supervisor: Prof. Ali Motie Nasrabadi
