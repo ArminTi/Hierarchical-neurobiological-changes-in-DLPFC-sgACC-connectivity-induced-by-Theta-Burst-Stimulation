@@ -240,8 +240,10 @@ for e = 1:numEpochs
     % spm_dcm_peb_review(BMA_ctbs_vs_sham_epoch, GCM_ctbs_vs_sham_epoch, C);
 end
 
-
-%% Remove the intercept (i.e., the first column) for both itbs and ctbs PEBs
+%%
+%-------------------------------------------------------
+% Remove the intercept (B0) for both itbs and ctbs PEBs
+%--------------------------------------------------------
 for e = 1:numEpochs
     
     % ================ PEB_itbs_vs_sham_all ================
