@@ -324,12 +324,14 @@ end
 % Define the patterns across the 4 epochs
 pattern_baseline = [1;  1;  1;  1];   % no change over time
 pattern_transient = [1; -1; -1;  1];  % transient change returns to baseline at the end
-short_delayed = [1; 1; -1;  -1];  % 
-late_delayed = [1; 1; 1;  -1];  % 
+short_delayed = [1; 1; -1;  -1]; 
+late_delayed = [1; 1; 1;  -1];  
 pattern_sustained = [1; -1; -1; -1];  % sustained change does not return to baseline
 
 M = struct();
-M.X = [pattern_baseline, pattern_transient,short_delayed,late_delayed, pattern_sustained];
+%M.X = [pattern_baseline, pattern_transient,short_delayed,late_delayed, pattern_sustained];
+M.X = [pattern_baseline, pattern_transient, pattern_sustained];
+
 fields = {'A','H','AN','T','CV'};
 
 %--------------------------------------------------------------------------
@@ -367,7 +369,7 @@ spm_dcm_peb_review(PEB_ctbs_second_level);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Full path
-full_path = fullfile('D:/signal_data/PEB_of_PEB_results', 'full_PEB_B0_removed.mat');
+full_path = fullfile('D:/signal_data/PEB_of_PEB_results', 'full_PEB_B0_removed_original.mat');
 
 % Save the workspace variables
 save(full_path);
