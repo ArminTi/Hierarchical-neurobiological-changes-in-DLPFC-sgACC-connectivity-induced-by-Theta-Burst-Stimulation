@@ -8,6 +8,7 @@ restoredefaultpath;
 
 % Add SPM12
 addpath('C:/Users/Growth fire/Programs/Matlab plugins/spm12/spm12');
+%addpath('C:/Users/Growth fire/Programs/Matlab plugins/spm_25.01.rc3/spm');
 spm('defaults', 'eeg'); % Start SPM with EEG defaults
 
 % --------------------------- Define Paths ---------------------------
@@ -187,8 +188,10 @@ fields = {'A','H','AN','T','CV'}; % Parameters to include in PEB
 % Preallocate cell arrays to store results for each epoch
 PEB_itbs_vs_sham_all = cell(numEpochs,1);
 BMA_itbs_vs_sham_all = cell(numEpochs,1);
+BMR_itbs_vs_sham_all = cell(numEpochs,1);
 PEB_ctbs_vs_sham_all = cell(numEpochs,1);
 BMA_ctbs_vs_sham_all = cell(numEpochs,1);
+BMR_ctbs_vs_sham_all = cell(numEpochs,1);
 
 for e = 1:numEpochs
     % ---------------------------
@@ -208,12 +211,12 @@ for e = 1:numEpochs
     M.X = [ones(nSham+nItbs,1), [repmat(-1,[nSham,1]); repmat(+1,[nItbs,1])]];
 
     PEB_itbs_vs_sham_epoch = spm_dcm_peb(GCM_itbs_vs_sham_epoch, M, fields);
-    BMA_itbs_vs_sham_epoch = spm_dcm_peb_bmc(PEB_itbs_vs_sham_epoch);
+    [BMA_itbs_vs_sham_epoch,BMR_itbs_vs_sham_epoch] = spm_dcm_peb_bmc(PEB_itbs_vs_sham_epoch);
 
     % Store results in cell arrays
     PEB_itbs_vs_sham_all{e} = PEB_itbs_vs_sham_epoch;
     BMA_itbs_vs_sham_all{e} = BMA_itbs_vs_sham_epoch;
-
+    BMR_itbs_vs_sham_all{e} = BMR_itbs_vs_sham_epoch;
     
     fprintf('Results for itbs vs sham, Epoch %d:\n', epochIndices(e));
     %spm_dcm_peb_review(BMA_itbs_vs_sham_epoch, GCM_itbs_vs_sham_epoch, C);
@@ -230,11 +233,12 @@ for e = 1:numEpochs
     M.X = [ones(nSham+nCtbs,1), [repmat(-1,[nSham,1]); repmat(+1,[nCtbs,1])]];
 
     PEB_ctbs_vs_sham_epoch = spm_dcm_peb(GCM_ctbs_vs_sham_epoch, M, fields);
-    BMA_ctbs_vs_sham_epoch = spm_dcm_peb_bmc(PEB_ctbs_vs_sham_epoch);
+    [BMA_ctbs_vs_sham_epoch,BMR_ctbs_vs_sham_epoch] = spm_dcm_peb_bmc(PEB_ctbs_vs_sham_epoch);
 
     % Store results for ctbs vs sham
     PEB_ctbs_vs_sham_all{e} = PEB_ctbs_vs_sham_epoch;
     BMA_ctbs_vs_sham_all{e} = BMA_ctbs_vs_sham_epoch;
+    BMR_ctbs_vs_sham_all{e} = BMR_ctbs_vs_sham_epoch;
 
     fprintf('Results for ctbs vs sham, Epoch %d:\n', epochIndices(e));
     % spm_dcm_peb_review(BMA_ctbs_vs_sham_epoch, GCM_ctbs_vs_sham_epoch, C);
@@ -320,10 +324,12 @@ end
 % Define the patterns across the 4 epochs
 pattern_baseline = [1;  1;  1;  1];   % no change over time
 pattern_transient = [1; -1; -1;  1];  % transient change returns to baseline at the end
+short_delayed = [1; 1; -1;  -1];  % 
+late_delayed = [1; 1; 1;  -1];  % 
 pattern_sustained = [1; -1; -1; -1];  % sustained change does not return to baseline
 
 M = struct();
-M.X = [pattern_baseline, pattern_transient, pattern_sustained];
+M.X = [pattern_baseline, pattern_transient,short_delayed,late_delayed, pattern_sustained];
 fields = {'A','H','AN','T','CV'};
 
 %--------------------------------------------------------------------------
@@ -337,7 +343,7 @@ fields = {'A','H','AN','T','CV'};
 PEB_itbs_second_level = spm_dcm_peb(PEB_itbs_vs_sham_all, M, fields);
 
 % Perform Bayesian Model Averaging/Comparison at second-level
-BMA_itbs_second_level = spm_dcm_peb_bmc(PEB_itbs_second_level);
+[BMA_itbs_second_level,BMR_itbs_second_level] = spm_dcm_peb_bmc(PEB_itbs_second_level);
 
 fprintf('Second-level results (itbs vs sham): \n');
 spm_dcm_peb_review(PEB_itbs_second_level);
@@ -350,11 +356,11 @@ input('Press Enter to continue to the ctbs vs sham analysis...');
 
 % Repeat for ctbs vs sham
 PEB_ctbs_second_level = spm_dcm_peb(PEB_ctbs_vs_sham_all, M, fields);
-BMA_ctbs_second_level = spm_dcm_peb_bmc(PEB_ctbs_second_level);
+[BMA_ctbs_second_level,BMR_ctbs_second_level] = spm_dcm_peb_bmc(PEB_ctbs_second_level);
 
 % Review results 
 fprintf('Second-level results (ctbs vs sham):\n');
-spm_dcm_peb_review( PEB_ctbs_second_level);
+spm_dcm_peb_review(PEB_ctbs_second_level);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % THE END :)
