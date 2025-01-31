@@ -20,7 +20,7 @@
 2. Source localization: using individual MRI and real-time chanel locs
 3. Model specification: spectral DCM, Conductance-based Canonical Microcircuit Model (cmm-NMDA)
 4. Model estimation
-5. Explained Variance: More than 95 is desirable
+5. Explained Variance
 6. Model Selection: Using model variation and selecting the best model with free energy criteria
 7. First Level Parametric empirical bayes
 8. Peb of Peb: The influence of TMS protocols on connectivity parameters
