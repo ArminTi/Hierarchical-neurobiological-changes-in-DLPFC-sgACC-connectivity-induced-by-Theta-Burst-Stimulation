@@ -7,12 +7,12 @@ original_path = path;
 restoredefaultpath;
 
 % Add SPM12
-addpath('C:/Users/Growth fire/Programs/Matlab plugins/spm12/spm12');
-%addpath('C:/Users/Growth fire/Programs/Matlab plugins/spm_25.01.rc3/spm');
+%addpath('C:/Users/Growth fire/Programs/Matlab plugins/spm12/spm12');
+addpath('C:/Users/Growth fire/Programs/Matlab plugins/spm_25.01.rc3/spm');
 spm('defaults', 'eeg'); % Start SPM with EEG defaults
 
 % --------------------------- Define Paths ---------------------------
-file_path = 'D:/signal_data/DCM_fitted/doing';
+file_path = 'D:/signal_data/DCM_fitted/new_prior2';
 file_pattern = 'fitted_DCM_SPM_sub-*_ses-*_epoch-*_converted_data_*.mat';
 files = dir(fullfile(file_path, file_pattern));
 cd(file_path);
@@ -193,7 +193,7 @@ PEB_ctbs_vs_sham_all = cell(numEpochs,1);
 BMA_ctbs_vs_sham_all = cell(numEpochs,1);
 BMR_ctbs_vs_sham_all = cell(numEpochs,1);
 
-for e = 1:numEpochs
+parfor e = 1:numEpochs
     % ---------------------------
     % itbs vs sham for epoch e
     % ---------------------------
@@ -245,72 +245,7 @@ for e = 1:numEpochs
 end
 
 %%
-%-------------------------------------------------------
-% Remove the intercept (B0) for both itbs and ctbs PEBs
-%--------------------------------------------------------
-for e = 1:numEpochs
-    
-    % ================ PEB_itbs_vs_sham_all ================
-    PEB = PEB_itbs_vs_sham_all{e};
-    
-    % Some epochs might be empty if no valid data, so check:
-    if ~isempty(PEB)
-        % 1) Keep only the second column in M.X (the group difference).
-        %    Originally M.X was [N × 2]. Now it becomes [N × 1].
-        PEB.M.X = PEB.M.X(:,2);
 
-        % 2) Ep was [88 × 2]. Keep only the second column → [88 × 1].
-        PEB.Ep = PEB.Ep(:,2);
-
-        % 3) Cp was [176 × 176].  The block (89:176, 89:176) 
-        %    corresponds to the second column’s parameters.
-        PEB.Cp = PEB.Cp(89:176, 89:176);
-
-        % 4) M.pE was [176 × 1].  Keep (89:176) → [88 × 1].
-        PEB.M.pE = PEB.M.pE(89:176);
-
-        % 5) M.pC was [176 × 176]. Keep the same block (89:176, 89:176).
-        PEB.M.pC = PEB.M.pC(89:176, 89:176);
-
-        % 6) (Optional but recommended) Fix Xnames to show only the second covariate
-        %    If your original was something like {'Covariate 1','Covariate 2'},
-        %    now you only want {'Covariate 2'}.
-        if isfield(PEB,'Xnames') && numel(PEB.Xnames) >= 2
-            PEB.Xnames = {PEB.Xnames{2}};
-        end
-
-        % 7) Store the updated PEB back into your cell array
-        PEB_itbs_vs_sham_all{e} = PEB;
-    end
-    
-    % ================ PEB_ctbs_vs_sham_all ================
-    PEB = PEB_ctbs_vs_sham_all{e};
-    
-    if ~isempty(PEB)
-        % 1) Keep only the second column
-        PEB.M.X = PEB.M.X(:,2);
-
-        % 2) Keep only the second column in Ep
-        PEB.Ep = PEB.Ep(:,2);
-
-        % 3) Prune Cp to keep the lower‐right block
-        PEB.Cp = PEB.Cp(89:176, 89:176);
-
-        % 4) pE
-        PEB.M.pE = PEB.M.pE(89:176);
-
-        % 5) pC
-        PEB.M.pC = PEB.M.pC(89:176, 89:176);
-
-        % 6) Fix Xnames
-        if isfield(PEB,'Xnames') && numel(PEB.Xnames) >= 2
-            PEB.Xnames = {PEB.Xnames{2}};
-        end
-
-        % 7) Store back
-        PEB_ctbs_vs_sham_all{e} = PEB;
-    end
-end
 
 %%
 % -----------------------------------------------------------------------
@@ -324,12 +259,9 @@ end
 % Define the patterns across the 4 epochs
 pattern_baseline = [1;  1;  1;  1];   % no change over time
 pattern_transient = [1; -1; -1;  1];  % transient change returns to baseline at the end
-short_delayed = [1; 1; -1;  -1]; 
-late_delayed = [1; 1; 1;  -1];  
 pattern_sustained = [1; -1; -1; -1];  % sustained change does not return to baseline
 
 M = struct();
-%M.X = [pattern_baseline, pattern_transient,short_delayed,late_delayed, pattern_sustained];
 M.X = [pattern_baseline, pattern_transient, pattern_sustained];
 
 fields = {'A','H','AN','T','CV'};
@@ -369,7 +301,7 @@ spm_dcm_peb_review(PEB_ctbs_second_level);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Full path
-full_path = fullfile('D:/signal_data/PEB_of_PEB_results', 'full_PEB_B0_removed_original.mat');
+full_path = fullfile('D:/signal_data/PEB_of_PEB_results', 'full_PEB_B0_removed_original_newprior2.mat');
 
 % Save the workspace variables
 save(full_path);
