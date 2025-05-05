@@ -1,6 +1,7 @@
 # Hierarchical neurobiological changes in DLPFC–sgACC connectivity induced by Theta-Burst Stimulation
 
-## Steps:
+## Steps Processing Pipline:
+![image](https://github.com/user-attachments/assets/4af15c6e-61ee-47ba-b1f7-6d4d611ba84f)
 
 ### Data Preprocessing
 1. Specifying rest eeg trials (remove TEP epochs)
