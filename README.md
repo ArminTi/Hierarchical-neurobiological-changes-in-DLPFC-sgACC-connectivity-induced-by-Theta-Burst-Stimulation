@@ -1,4 +1,4 @@
-# Computational analysis of longitudinal electroencephalograms after theta burst stimulation over left DLPFC using hierarchical dynamic causal modelling.
+# Hierarchical neurobiological changes in DLPFC–sgACC connectivity induced by Theta-Burst Stimulation
 
 ## Steps:
 
