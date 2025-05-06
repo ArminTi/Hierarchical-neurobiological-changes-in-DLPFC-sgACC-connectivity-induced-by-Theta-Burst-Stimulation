@@ -29,15 +29,15 @@ from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / 'data'
 NODE_IMAGES_DEFAULT = {
-    1: DATA_DIR / 'node_images' / 'SS.png',
-    2: DATA_DIR / 'node_images' / 'SP.png',
-    3: DATA_DIR / 'node_images' / 'II.png',
-    4: DATA_DIR / 'node_images' / 'DP.png',
+    1: DATA_DIR / 'Shapes' / 'SS.png',
+    2: DATA_DIR / 'Shapes' / 'SP.png',
+    3: DATA_DIR / 'Shapes' / 'II.png',
+    4: DATA_DIR / 'Shapes' / 'DP.png',
 }
 SHAPE_IMAGES_DEFAULT = {
-    1: DATA_DIR / 'shape_images' / 'T1.png',
-    2: DATA_DIR / 'shape_images' / 'T2.png',
-    3: DATA_DIR / 'shape_images' / 'T3.png',
+    1: DATA_DIR / 'Shapes' / 'T1.png',
+    2: DATA_DIR / 'Shapes' / 'T2.png',
+    3: DATA_DIR / 'Shapes' / 'T3.png',
 }
 
 # -------------------------------
