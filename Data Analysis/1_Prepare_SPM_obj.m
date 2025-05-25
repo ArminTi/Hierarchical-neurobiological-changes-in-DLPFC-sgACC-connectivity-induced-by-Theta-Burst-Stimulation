@@ -6,20 +6,16 @@ clc;
 % the paths to its original after running our program so that they are not
 % both in the general paths at the same time 
 original_path = path;
-restoredefaultpath;
-
-% Add FieldTrip 
-addpath('C:/Users/Growth fire/Programs/Matlab plugins/fieldtrip-20240731');
-ft_defaults; % Initialize FieldTrip
-
 % Add SPM12
-addpath('C:/Users/Growth fire/Programs/Matlab plugins/spm12/spm12');
+%addpath('C:/Users/Growth fire/Programs/Matlab plugins/spm12/spm12');
+addpath('C:/Users/Skibidi/Documents/Programs/spm_25.01.02/spm')
 spm('defaults', 'eeg'); % Start SPM with EEG defaults
+
 
 % --------------------------- Define Paths ---------------------------
 
 % Define the root directory containing the subfolders
-root_dir = 'D:/signal_data/new_preprocessing_rawdata/doing';
+root_dir = 'C:/Users/Skibidi/Documents/Research/team44_signal/new_preprocessing_rawdata/done';
 file_list = dir(fullfile(root_dir, '**', '*.mat'));
 % if you want to specifiy a single file you can use this instead
 %file_list = dir(fullfile(root_dir, '**', 'sub-01_ses-01_epoch-01_converted_data.mat'));
@@ -34,17 +30,17 @@ for i = 1:length(file_list)
     fprintf('%s\n', fullfile(file_list(i).folder, file_list(i).name));
 end
 
-elec_path = 'D:/signal_data/raw_blocked_data/19297701';
+elec_path = 'C:/Users/Skibidi/Documents/Research/team44_signal//raw_blocked_data/19297701';
 elec_file = 'sub-*_*-*_electrodes.csv';
 elecs = dir(fullfile(elec_path, elec_file));
 
-output_folder = 'D:/signal_data/all_spm_obj/doing';
+output_folder = 'C:/Users/Skibidi/Documents/Research/team44_signal/all_spm_obj/newp_no_nm_AAC';
 if ~exist(output_folder, 'dir')
     mkdir(output_folder);
 end
 
 % Load the data that shows participants recived which modality in that session
-participants_csv = 'D:/signal_data/new_preprocessing_rawdata/participants.csv'; 
+participants_csv = 'C:/Users/Skibidi/Documents/Research/team44_signal/new_preprocessing_rawdata/participants.csv'; 
 participants_data = readtable(participants_csv);
 
 % Defining channel labels for consistency with SPM format
