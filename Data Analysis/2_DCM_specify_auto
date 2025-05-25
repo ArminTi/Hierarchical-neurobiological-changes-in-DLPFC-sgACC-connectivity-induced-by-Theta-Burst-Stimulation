@@ -9,20 +9,20 @@ clc;
 % ----------------------------- Setup --------------------------------
 original_path = path;
 restoredefaultpath;
-addpath('C:/Users/Growth fire/Programs/Matlab plugins/spm12/spm12');
+addpath('C:/Users/Skibidi/Documents/Programs/spm_25.01.02/spm')
 spm('defaults', 'eeg'); % Start SPM with EEG defaults
 
 % --------------------------- Define Paths ---------------------------
-file_path = 'D:/signal_data/all_spm_obj/doing';
+file_path = 'C:/Users/Skibidi/Documents/Research/team44_signal/all_spm_obj/newp_no_nm_AAC';
 file_name = 'SPM_sub-*_ses-*_epoch-*_converted_data_*.mat';  % Files to be processed
 files = dir(fullfile(file_path, file_name));
 cd(file_path)
 
-addpath('D:/signal_data/code_looped');
-MRI_path = 'D:/signal_data/MRIs/all_MRIs';
+addpath('C:/Users/Skibidi/Documents/Research/team44_signal/code_looped');
+MRI_path = 'C:/Users/Skibidi/Documents/Research/team44_signal/MRIs/all_MRIs';
 MRI_file_pattern = 'sub-*_T1075TFESag.nii'; % Adjust the pattern if needed
 
-output_folder = 'D:/signal_data/DCM_Specified/doing';
+output_folder = 'C:/Users/Skibidi/Documents/Research/team44_signal/DCM_Specified/newp_no_nm_AAC';
 if ~exist(output_folder, 'dir')
     mkdir(output_folder);
 end
@@ -148,20 +148,16 @@ for i = 1:length(files)
     DCM.options.mod_int = 1;
 
     % ------------------- Specify Regions of Interest -------------------
-    DCM.Lpos  = [[-46; -66; 30], [49; -63; 33], [0; -58; 0], [-1; 54; 27]]; % Source locations
-    DCM.Sname = {'lLP', 'rLP', 'PC', 'MPC'}; % Source names
+    DCM.Lpos  = [[-38; 44; 26], [38; 44; 26],[-10; 20; -15],[5;15;-15]];
+    DCM.Sname = {'L.DLPFC','R.DLPFC','L.sgAAC','R.sgAAC'};
 
     % ------------------- Define Connectivity Matrices -------------------
     Nareas = size(DCM.Lpos, 2);
-    DCM.A{1} = [0 1 0 0;
-                1 0 0 0;
-                1 1 0 0;
-                1 1 1 0]; % Forward connections
+    DCM.A{1}             = ones(Nareas);
 
-    DCM.A{2} = [0 1 1 1;
-                1 0 1 1;
-                0 0 0 1;
-                0 0 0 0]; % Backward connections
+
+    DCM.A{2}             = ones(Nareas);
+
 
     DCM.A{3} = zeros(Nareas); % Lateral connections
     DCM.B = {}; % No modulatory effects data is rest
@@ -172,27 +168,31 @@ for i = 1:length(files)
     DCM.xU = xU;
     % ------------------- Process Data to Initialize DCM.M.U -------------------
     DCM = spm_dcm_erp_data(DCM);
+    Ns = Nareas;
 
     % ------------------- Specify Neuronal Model -----------------------
-    DCM.M.dipfit.model = 'CMM_NMDA'; %% specific the 'CMM models'
-    DCM.M.dipfit.type  = 'IMG'; %%% 'IMG' forward model 
+    DCM.M.dipfit.model = global_DCM_options.model; %% specific the 'CMM models'
+    DCM.M.dipfit.type  = global_DCM_options.spatial; %%% 'IMG' forward model 
+    %DCM.M.dipfit.Nc          = Ns;
+    %DCM.M.dipfit.Ns          = Ns;
+    %DCM.M.U                  = eye(Ns,Ns); 
     DCM.M.nograph=1;%% supress visual feedback during model fitting
 
     DCM = spm_dcm_erp_dipfit(DCM, 1 );
-    DCM = spm_dcm_csd_data(DCM);
+
+    
 
     % -------------------- Specify Priors -----------------------------
     % neural priors
-    [pE,pC] = spm_cmm_NMDA_priors(DCM.A,DCM.B,DCM.C);
+    [pE,pC]  = spm_dcm_neural_priors(DCM.A,DCM.B,DCM.C,global_DCM_options.model);
+    [pE,pC]  = spm_L_priors(DCM.M.dipfit,pE,pC);
+    [pE,pC]  = spm_ssr_priors(pE,pC);
     DCM.M.pE = pE; % prior
     DCM.M.pC = pC; % prior covarience
-    DCM.M.pE.G = sparse(length(DCM.Sname),10);
-    DCM.M.pC.G = sparse(length(DCM.Sname),10)+1/8;
-    
-
+     
     % ------------------- Load Cross-Spectral Data -------------------
-    [DCM.M.pE,DCM.M.pC] = spm_L_priors(DCM.M.dipfit,pE,pC);
-    
+    DCM = spm_dcm_csd_data(DCM);
+
     % ------------------- Max Number of VB Iterations -------------------
     DCM.M.Nmax = 256;
     DCM.M.nograph = 1; % Suppress graphical output
