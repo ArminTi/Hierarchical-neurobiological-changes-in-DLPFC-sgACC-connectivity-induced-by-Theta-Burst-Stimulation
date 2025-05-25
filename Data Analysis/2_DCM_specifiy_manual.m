@@ -48,26 +48,19 @@ for i = 1:length(files)
     DCM.options.mod_int = 1;
     % ------------------------- connections ---------------------------
     %############################################################
-    DCM.Lpos  = [[-46; -66; 30] [49; -63; 33] [0 ;-58; 0] [-1 ;54; 27] ];
-    DCM.Sname = {'lLP', 'rLP', 'PC', 'MPC'};
+    DCM.Lpos  = [[-38; 44; 26], [38; 44; 26],[-10; 20; -15],[5;15;-15]];
+    DCM.Sname = {'L.DLPFC','R.DLPFC','L.sgAAC','R.sgAAC'};
     %'left LP', 'right LP', 'posterior cingulate', 'medial prefrontal cortex'
-    Nareas    = size(DCM.Lpos,2);
-    DCM.A{1} = [0 1 0 0;
-                1 0 0 0;
-                1 1 0 0;
-                1 1 1 0]; %Forward model
+    Nareas = size(DCM.Lpos, 2);
+    DCM.A{1}             = ones(Nareas);
 
-    DCM.A{2} = [0 1 1 1;
-                1 0 1 1;
-                0 0 0 1;
-                0 0 0 0]; %Backward model
 
-    DCM.A{3} = [0 0 0 0;
-                0 0 0 0;
-                0 0 0 0;
-                0 0 0 0]; %Lateral
-    DCM.B = cell(0, 0); % rest data
-    DCM.C = []; % rest data
+    DCM.A{2}             = ones(Nareas);
+
+
+    DCM.A{3} = zeros(Nareas); % Lateral connections
+    DCM.B = {}; % No modulatory effects data is rest
+    DCM.C = []; % No external inputs data is rest
     %############################################################
     %design matrix
     xU.name = '';
