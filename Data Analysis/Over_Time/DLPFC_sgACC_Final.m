@@ -64,8 +64,8 @@ spm_dcm_peb_review(BMA_ctbs_final);
 
 %% peb second level: sham
 
-sham_final = spm_dcm_peb(Peb_ctbs, M, fields);
-BMA_sham_final = spm_dcm_peb_bmc(cTBS_final);
+sham_final = spm_dcm_peb(Peb_sham, M, fields);
+BMA_sham_final = spm_dcm_peb_bmc(sham_final);
 save('BMA_sham_overtime', 'BMA_sham_final')
 spm_dcm_peb_review(BMA_sham_final);
 
@@ -96,3 +96,4 @@ load("BMA_iTBS_winning_model.mat")
 spm_dcm_peb_review(BMA_itbs);
 input("enter to continue")
 spm_dcm_peb_review(BMA_ctbs);
+
