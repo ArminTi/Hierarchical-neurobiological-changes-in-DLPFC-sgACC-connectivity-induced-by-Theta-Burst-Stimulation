@@ -24,8 +24,8 @@ Citation: Moffa, A. H. et al. Neuromodulatory effects of theta burst stimulation
 ## Repository layout
 
 - **processing_eeg_pipeline/**
-  - `tbs_rseeg_pipeline.m` — main pipeline script  
-  - `functions/` — helper functions used by the pipeline  
+  - `tbs_rseeg_pipeline.m` _ main pipeline script  
+  - `functions/` _ helper functions used by the pipeline  
 
 - **dcm_analysis/**
   - *I. DCM* _ model specification and estimation  
