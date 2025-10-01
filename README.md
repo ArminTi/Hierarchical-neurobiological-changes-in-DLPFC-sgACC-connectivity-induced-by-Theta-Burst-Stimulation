@@ -6,14 +6,22 @@
 
 
 
+Reproducible TMS-EEG preprocessing and DCM/PEB analysis.
 
-### Raw TMS-EEG and Raw EEG data:
+## Requirements
+- MATLAB R2023b
+- SPM 25
+- Python 3
+
+## Data
 Available: https://doi.org/10.25452/figshare.plus.c.5910329
 
 Citation: Moffa, A. H. et al. Neuromodulatory effects of theta burst stimulation to the prefrontal cortex. Sci Data 9, 717 (2022).
 
-### Codes
-For Preprocessing You can check: Preprocessing Folder
+## Repository layout
+processing_eeg_pipeline  
+|-  tbs_rseeg_pipeline.m          (main pipeline script)  
+|-  functions/                     (helper functions used by the pipeline)
 
-For DCM and PEB analysis You can check: Data Analysis Folder
-
+dcm_analysis/ # DCM + PEB scripts
+plots/ # generated figures
