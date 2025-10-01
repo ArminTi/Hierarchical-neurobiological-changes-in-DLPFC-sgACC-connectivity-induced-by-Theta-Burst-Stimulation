@@ -10,8 +10,10 @@ Reproducible TMS-EEG preprocessing and DCM/PEB analysis.
 
 ## Requirements
 - MATLAB R2023b
-- SPM 25
+- SPM 25 (25.01.rc3)
 - Python 3
+- FieldTrip 
+
 
 ## Data
 Available: https://doi.org/10.25452/figshare.plus.c.5910329
@@ -23,5 +25,8 @@ processing_eeg_pipeline
 |-  tbs_rseeg_pipeline.m          (main pipeline script)  
 |-  functions/                     (helper functions used by the pipeline)
 
-dcm_analysis/ # DCM + PEB scripts
-plots/ # generated figures
+dcm_analysis (DCM + PEB scripts)
+|-  
+
+
+plots/ 
