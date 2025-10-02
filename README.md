@@ -2,10 +2,10 @@
 This repository contains code that can be used to reproduce a Dynamic Causal Modelling (DCM) analysis and hierarchical Parametric Empirical Bayes (PEB) analysis for computing induced connectivity changes in DLPFC–sgACC brain regions after Theta Burst Stimulation (TMS) in 22 healthy participants.
 
 ## Requirements
-- MATLAB R2023b
+- MATLAB (R2023b)
 - SPM 25 (25.01.rc3)
 - Python 3
-- FieldTrip 
+- FieldTrip (20231220)
 
 
 ## Data
