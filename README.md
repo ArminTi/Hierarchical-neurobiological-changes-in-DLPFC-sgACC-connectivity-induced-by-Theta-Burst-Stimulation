@@ -1,11 +1,4 @@
 # Hierarchical neurobiological changes in DLPFC–sgACC connectivity induced by Theta-Burst Stimulation
-
-## Processing Pipline:
-![image](https://github.com/user-attachments/assets/4af15c6e-61ee-47ba-b1f7-6d4d611ba84f)
-
-
-
-
 This repository contains code that can be used to reproduce a Dynamic Causal Modelling (DCM) analysis and hierarchical Parametric Empirical Bayes (PEB) analysis for computing induced connectivity changes in DLPFC–sgACC brain regions after Theta Burst Stimulation (TMS) in 22 healthy participants.
 
 ## Requirements
