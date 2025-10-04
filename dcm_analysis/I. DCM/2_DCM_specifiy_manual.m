@@ -50,7 +50,6 @@ for i = 1:length(files)
     %############################################################
     DCM.Lpos  = [[-38; 44; 26], [38; 44; 26],[-10; 20; -15],[5;15;-15]];
     DCM.Sname = {'L.DLPFC','R.DLPFC','L.sgAAC','R.sgAAC'};
-    %'left LP', 'right LP', 'posterior cingulate', 'medial prefrontal cortex'
     Nareas = size(DCM.Lpos, 2);
     DCM.A{1}             = ones(Nareas);
 
@@ -105,3 +104,4 @@ end
 
 restoredefaultpath;
 fprintf('DCM specification completed for all files.\n');
+
