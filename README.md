@@ -32,9 +32,8 @@ Citation: Moffa, A. H. et al. Neuromodulatory effects of theta burst stimulation
 
 <br><br>
 
-# EEG → DCM → PEB → Plots Workflow
-
-## 1️⃣ Preprocessing
+## EEG → DCM → PEB → Plots Workflow
+### 1️⃣ Preprocessing
 
 **Input:** Raw EEG dataset (healthy individuals, pre- and 3 time-points post-TMS)  
 **Main script:** `processing_eeg_pipeline/tbs_rseeg_pipeline.m`  
@@ -46,7 +45,7 @@ Citation: Moffa, A. H. et al. Neuromodulatory effects of theta burst stimulation
 
 ---
 
-## 2️⃣ Prepare SPM Object
+### 2️⃣ Prepare SPM Object
 
 **Script:** `dcm_analysis/I. DCM/1_Prepare_SPM_obj.m`
 
@@ -57,7 +56,7 @@ Citation: Moffa, A. H. et al. Neuromodulatory effects of theta burst stimulation
 
 ---
 
-## 3️⃣ Specify DCM Models
+### 3️⃣ Specify DCM Models
 
 **Scripts**
 - Manual: `dcm_analysis/I. DCM/2_DCM_specifiy_manual.m`  
@@ -75,7 +74,7 @@ Citation: Moffa, A. H. et al. Neuromodulatory effects of theta burst stimulation
 
 ---
 
-## 4️⃣ Fit DCM Models
+### 4️⃣ Fit DCM Models
 
 **Script:** `dcm_analysis/I. DCM/3_Fitting_DCM_Models.m`
 
@@ -90,7 +89,7 @@ Citation: Moffa, A. H. et al. Neuromodulatory effects of theta burst stimulation
 
 ---
 
-## 5️⃣ Hierarchical PEB Analysis
+### 5️⃣ Hierarchical PEB Analysis
 
 **Folders**
 - Pre/Post comparisons: `dcm_analysis/II. PEB/Pre_Post/`  
@@ -108,7 +107,7 @@ Citation: Moffa, A. H. et al. Neuromodulatory effects of theta burst stimulation
 
 ---
 
-## 6️⃣ Plot Results
+### 6️⃣ Plot Results
 
 **Extraction:** `Plots/extract_BMA_data_for_plot_v2.m`
 
