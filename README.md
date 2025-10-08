@@ -33,7 +33,7 @@ Citation: Moffa, A. H. et al. Neuromodulatory effects of theta burst stimulation
 <br><br>
 -->
 ## EEG → DCM → PEB → Plots Workflow
-![alt text](gitfig1.svg)
+![alt text](gitfig2.svg)
 <!--
 ### 1️⃣ Preprocessing
 
