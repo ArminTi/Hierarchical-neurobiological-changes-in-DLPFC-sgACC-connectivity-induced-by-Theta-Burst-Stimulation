@@ -29,9 +29,9 @@ Citation: Moffa, A. H. et al. Neuromodulatory effects of theta burst stimulation
 - **plots/**
   - `extract_BMA_data_for_plot.m` _ extracts output parameters for plotting  
   - `connectivity_plot.m` _ plots macro, meso, and micro connections/dynamics  
-
+<!--
 <br><br>
-
+-->
 ## EEG → DCM → PEB → Plots Workflow
 ![alt text](gitfig1.svg)
 <!--
