@@ -33,6 +33,8 @@ Citation: Moffa, A. H. et al. Neuromodulatory effects of theta burst stimulation
 <br><br>
 
 ## EEG → DCM → PEB → Plots Workflow
+![alt text](gitfig1.svg)
+<!--
 ### 1️⃣ Preprocessing
 
 **Input:** Raw EEG dataset (healthy individuals, pre- and 3 time-points post-TMS)  
@@ -117,6 +119,7 @@ Citation: Moffa, A. H. et al. Neuromodulatory effects of theta burst stimulation
 - Modality comparison: `Plots/modality_compare_plot.py`
 
 ---
+-->
 <!--
 ### 📁 Summary Workflow
 <p style="margin-left: 60px;">Raw EEG  </p>
