@@ -23,8 +23,12 @@ Citation: Moffa, A. H. et al. Neuromodulatory effects of theta burst stimulation
 - **dcm_analysis/**
   - *I. DCM* _ model specification and estimation  
   - *II. PEB* _ hierarchical PEB comparison between modalities and timelines  
-    - **Pre_Post/** _ scripts + BMA output (before vs immediately after TMS)  
-    - **Over_Time/** _ scripts + BMAoutput (Baseline, sustained, and transient)  
+    - **Pre_Post/** _ scripts (before vs immediately after TMS)  
+    - **Over_Time/** _ scripts (Baseline, sustained, and transient) 
+
+- **BMA_Results/** 
+  - **Pre_Post/**_ BMA output (before vs immediately after TMS)  
+  - **Over_Time/** _ BMA output (Baseline, sustained, and transient) 
 
 - **plots/**
   - `extract_BMA_data_for_plot.m` _ extracts output parameters for plotting  
