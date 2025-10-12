@@ -13,30 +13,8 @@ Available: https://doi.org/10.25452/figshare.plus.c.5910329
 
 Citation: Moffa, A. H. et al. Neuromodulatory effects of theta burst stimulation to the prefrontal cortex. Sci Data 9, 717 (2022).
 
-
-## Repository layout
-
-- **processing_eeg_pipeline/**
-  - `tbs_rseeg_pipeline.m` _ main pipeline script  
-  - `functions/` _ helper functions used by the pipeline  
-
-- **dcm_analysis/**
-  - *I. DCM* _ model specification and estimation  
-  - *II. PEB* _ hierarchical PEB comparison between modalities and timelines  
-    - **Pre_Post/** _ scripts (before vs immediately after TMS)  
-    - **Over_Time/** _ scripts (Baseline, sustained, and transient) 
-
-- **BMA_Results/** 
-  - **Pre_Post/**_ BMA output (before vs immediately after TMS)  
-  - **Over_Time/** _ BMA output (Baseline, sustained, and transient) 
-
-- **plots/**
-  - `extract_BMA_data_for_plot.m` _ extracts output parameters for plotting  
-  - `connectivity_plot.m` _ plots macro, meso, and micro connections/dynamics  
-<!--
-<br><br>
 -->
-## EEG → DCM → PEB → Plots Workflow
+## Step by Step Guide
 ![alt text](gitfig3.svg)
 <!--
 ### 1️⃣ Preprocessing
