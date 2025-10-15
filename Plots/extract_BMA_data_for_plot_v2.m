@@ -1,12 +1,26 @@
 %% batch_extract_BMA_data_for_plot.m
-% For each BMA_*.mat in the folder:
-%   - Threshold PEB/BMA (Ep, Cp, Pnames) robustly
-%   - Find a matching Peb_*.mat (best-effort by token), compute percentageCell
-%   - Save Results into plot_<token>_final_secondlevel_results.mat
+% Purpose:
+%   Process each BMA_*.mat in the working folder and write a plotting-friendly
+%   results file (plot_<token>.mat) containing thresholded parameters.
+%
+% Steps:
+%   - Load PEB/BMA and compute posterior probabilities (Pp) from Ep and Cp.
+%   - Normalize/expand Pnames across covariate repetitions without introducing "#k".
+%   - Collapse any residual duplicates that differ only by a trailing "#k".
+%   - (Optional) Pair to Peb_*.mat and compute percentageCell summaries.
+%   - Save Results with the field `PEB_thresholded`.
+%
+% Requirements:
+%   - MATLAB + SPM12 available on the MATLAB path (tested with 25.01.x family).
+%
+% Notes:
+%   - The duplicate-collapse prevents multiple arrows for the same intrinsic
+%     connection when BMA exports repeated covariate blocks.
+%   - Replace any machine-specific paths before committing to a public repo.
 
-%% 1) Setup SPM (EDIT THIS PATH)
-spmPath = 'C:/Users/Growth fire/Programs/Matlab plugins/spm_25.01.rc3/spm';
-if exist(spmPath,'dir')
+%% 1) Setup SPM (edit local paths as needed; ensure SPM is on the MATLAB path)
+addpath('C:/Users/Skibidi/Documents/Programs/spm_25.01.02/spm') % <-- replace with your local SPM path or manage paths externally
+if exist(spmPath,'dir') % NOTE: spmPath must exist if used here; otherwise rely on the addpath() above
     addpath(spmPath);
     spm('defaults','eeg');
 else
@@ -14,8 +28,8 @@ else
 end
 
 %% 2) Parameters
-threshold = 0.95;   % Pp threshold
-T         = 0;      % value at which to evaluate spm_Ncdf
+threshold = 0.95;   % Posterior probability threshold for retaining parameters
+T         = 0;      % Value at which to evaluate spm_Ncdf
 
 %% 3) Enumerate all BMA files
 bmaList = dir('BMA_*.mat');
@@ -81,48 +95,70 @@ for k = 1:numel(bmaList)
         end
     end
 
-    nEp = numel(Ep);
+    nEp    = numel(Ep);
     nNames = numel(Pnames);
-    if nNames ~= nEp
-        warning('Pnames count (%d) != Ep count (%d) in %s. Adjusting.', nNames, nEp, bmaFile);
-        if nNames > 0 && mod(nEp, nNames) == 0
-            % Repeat the base set (annotate repetitions)
-            reps = nEp / nNames;
-            base = Pnames;
+
+    % If Ep contains repeated covariate blocks, expand Pnames by rewriting the
+    % "Covariate <j>:" prefix for each repetition (no "#k" suffix is appended).
+    if nNames > 0 && mod(nEp, nNames) == 0
+        reps = nEp / nNames;
+        if reps > 1
+            base = Pnames;                 % base labels (e.g., "Covariate 1: H(...)")
             Pnames_rep = cell(nEp,1);
             for j = 1:reps
                 idx = (j-1)*nNames + (1:nNames);
-                Pnames_rep(idx) = cellfun(@(s) sprintf('%s#%d', s, j), base, 'UniformOutput', false);
+                block = base;
+                % If there is an explicit "Covariate <num>:" prefix, rewrite it to j
+                hasCov = ~cellfun('isempty', regexp(block, '^(?i)\s*covariate\s+\d+\s*:'));
+                block(hasCov) = regexprep(block(hasCov), '^(?i)\s*covariate\s+\d+\s*:', sprintf('Covariate %d:', j));
+                % Otherwise, prepend a covariate prefix
+                block(~hasCov) = cellfun(@(s) sprintf('Covariate %d: %s', j, s), block(~hasCov), 'UniformOutput', false);
+                Pnames_rep(idx) = block;
             end
             Pnames = Pnames_rep;
-        else
-            % Last resort: pad or truncate with synthetic names
-            if nNames < nEp
-                Pnames(end+1:nEp) = arrayfun(@(i) sprintf('param_%d', i), (nNames+1):nEp, 'UniformOutput', false);
-            else
-                Pnames = Pnames(1:nEp);
-            end
+            nNames = numel(Pnames);
+            assert(nNames == nEp, 'Internal error: expanded Pnames length mismatch.');
         end
     end
-    % ----------------------------
+
+    % If still mismatched, fail fast (do not fabricate labels silently)
+    if nNames ~= nEp
+        error('Pnames count (%d) != Ep count (%d) in %s after normalization. Refusing to fabricate labels.', nNames, nEp, bmaFile);
+    end
 
     % Posterior probability
     Pp = 1 - spm_Ncdf(T, abs(Ep), Cp_marginal);
 
-    % Threshold
+    % Threshold (zero-out values below Pp threshold)
     mask  = (Pp >= threshold);
     EpThr = Ep;           EpThr(~mask) = 0;
     CpThr = Cp_marginal;  CpThr(~mask) = 0;
 
+    % Collapse duplicates that only differ by a trailing "#k" (e.g., "...#1", "...#2").
+    % This avoids duplicate edges per (covariate, ROI, src→dst) in downstream plots.
+    % Adjust `combineEp` if you prefer sum/max/first-nonzero instead of mean.
+    baseNames = regexprep(Pnames, '#\s*\d+\s*$', '');   % strip trailing #1/#2 if present
+    [uniqNames, ~, grp] = unique(baseNames, 'stable');
+
+    % Choose how to combine duplicates:
+    combineEp  = @(x) mean(x);   % alternatives: sum / max / first-nonzero
+    combinePp  = @(x) max(x);    % conservative: keep highest probability
+    combineCp  = @(x) max(x);    % conservative: keep largest retained variance
+
+    EpThr2 = accumarray(grp, EpThr, [], combineEp);
+    Pp2    = accumarray(grp, Pp,    [], combinePp);
+    CpThr2 = accumarray(grp, CpThr, [], combineCp);
+
     % Struct array, one per parameter (all columns same length now)
     PEB_thresholded = struct( ...
-        'Ep',     num2cell(EpThr(:)), ...
-        'Pp',     num2cell(Pp(:)), ...
-        'Pnames', Pnames(:), ...
-        'Cp',     num2cell(CpThr(:)) );
+        'Ep',     num2cell(EpThr2(:)), ...
+        'Pp',     num2cell(Pp2(:)), ...
+        'Pnames', uniqNames(:), ...
+        'Cp',     num2cell(CpThr2(:)) );
 
-    % Report
-    fprintf('  Params: %d | pass >=%.2f: %d | zeroed: %d\n', numel(Pp), threshold, nnz(mask), nnz(~mask));
+    % Report (raw count vs. unique after duplicate collapse)
+    fprintf('  Params (raw): %d | unique after collapse: %d | pass >=%.2f: %d | zeroed: %d\n', ...
+        numel(Pp), numel(Pp2), threshold, nnz(mask), nnz(~mask));
 
     %% 5) Find Peb file for this token (best-effort), compute percentageCell (optional)
     percentageCell = [];
@@ -222,4 +258,3 @@ function d = getDatenum(S)
     else, d = datenum(S.date);
     end
 end
-
