@@ -1,41 +1,65 @@
-%% batch_extract_BMA_data_for_plot.m
-% Purpose:
-%   Process each BMA_*.mat in the working folder and write a plotting-friendly
-%   results file (plot_<token>.mat) containing thresholded parameters.
+%% batch_extract_BMA_data_for_plot.m  —  SEGMENT-PRESERVING VERSION
+% ------------------------------------------------------------------------------
+% Overview
+% ------------------------------------------------------------------------------
+% This script processes each `BMA_*.mat` file in the current directory and
+% writes a companion `plot_<token>.mat` file containing a plotting-friendly
+% structure in `Results.PEB_thresholded`.
 %
-% Steps:
-%   - Load PEB/BMA and compute posterior probabilities (Pp) from Ep and Cp.
-%   - Normalize/expand Pnames across covariate repetitions without introducing "#k".
-%   - Collapse any residual duplicates that differ only by a trailing "#k".
-%   - (Optional) Pair to Peb_*.mat and compute percentageCell summaries.
-%   - Save Results with the field `PEB_thresholded`.
+% Key properties of the saved structure (segment-preserving contract):
+%   • `Ep`     — length nEp vector of parameter estimates with all segments
+%                concatenated in order (no reordering or deduplication).
+%   • `Pp`     — length nEp vector of posterior probabilities for `Ep`.
+%   • `Cp`     — length nEp vector of thresholded (retained) marginal variances.
+%   • `Pnames` — cellstr of length nNames representing a single covariate block
+%                (ONE block only; do not duplicate across segments).
 %
-% Requirements:
-%   - MATLAB + SPM12 available on the MATLAB path (tested with 25.01.x family).
+% Segment logic expected by the Python plotter:
+%     nSeg = numel(Ep) / numel(Pnames)
+%
+% Important design choices (by intent, do NOT change here):
+%   • Does NOT expand `Pnames` to match `Ep` length.
+%   • Does NOT collapse duplicate names or strip trailing "#k".
+%   • Only applies probability thresholding (zeroing), preserving vector length.
+%
+% Typical workflow:
+%   1) Place this script alongside your `BMA_*.mat` (and optionally `Peb_*.mat`).
+%   2) Run the script (it will create `plot_<token>.mat` files).
+%   3) Use the Python plotting code that splits segments via `nSeg` above.
+%
+% Dependencies:
+%   - MATLAB
+%   - SPM12 on the MATLAB path (tested with the 25.01.x family)
+%     (Only `spm_Ncdf` is required from SPM in this script.)
 %
 % Notes:
-%   - The duplicate-collapse prevents multiple arrows for the same intrinsic
-%     connection when BMA exports repeated covariate blocks.
-%   - Replace any machine-specific paths before committing to a public repo.
+%   - If a matching `Peb_*.mat` is found, the script also computes an optional
+%     `Results.percentageCell` summary (1×nCovariates cell).
+%   - Replace any machine-specific paths before committing this script.
+% ------------------------------------------------------------------------------
 
 %% 1) Setup SPM (edit local paths as needed; ensure SPM is on the MATLAB path)
-addpath('C:/Users/Skibidi/Documents/Programs/spm_25.01.02/spm') % <-- replace with your local SPM path or manage paths externally
-if exist(spmPath,'dir') % NOTE: spmPath must exist if used here; otherwise rely on the addpath() above
+addpath('C:/Users/Skibidi/Documents/Programs/spm_25.01.02/spm');  % <- edit if needed
+if exist('spmPath','var') && exist(spmPath,'dir')
     addpath(spmPath);
+end
+if exist('spm','file')
     spm('defaults','eeg');
 else
-    warning('SPM path not found: %s', spmPath);
+    warning('SPM not found on path; spm_Ncdf must still be resolvable.');
 end
 
 %% 2) Parameters
-threshold = 0.95;   % Posterior probability threshold for retaining parameters
-T         = 0;      % Value at which to evaluate spm_Ncdf
+% Posterior probability threshold: parameters with Pp < threshold are set to 0 in Ep/Cp.
+% T is the value at which the normal CDF is evaluated (standard approach in SPM).
+threshold = 0.95;
+T         = 0;
 
 %% 3) Enumerate all BMA files
 bmaList = dir('BMA_*.mat');
 assert(~isempty(bmaList),'No files matching BMA_*.mat found.');
 
-% Sort newest first (compatible with older MATLAB)
+% Sort newest first (compatible with older MATLAB structures)
 if isfield(bmaList,'datenum') && ~isempty([bmaList.datenum])
     [~,ord] = sort([bmaList.datenum], 'descend');
 else
@@ -50,7 +74,7 @@ for k = 1:numel(bmaList)
     bmaFile = bmaList(k).name;
     [~, stem] = fileparts(bmaFile);
 
-    % Extract base token: BMA_<token>[_secondlevel]
+    % Token extraction: BMA_<token>[_secondlevel] → <token>
     tok = regexp(stem, '^BMA_(.+?)(?:_secondlevel)?$', 'tokens', 'once');
     if ~isempty(tok), baseToken = tok{1}; else, baseToken = stem; end
 
@@ -61,10 +85,12 @@ for k = 1:numel(bmaList)
     fns = fieldnames(PEBstruct);
     PEB = PEBstruct.(fns{1});
 
-    % ---- Standardize shapes ----
-    Ep = PEB.Ep(:);                        % column vector
+    % ---- Standardize shapes ---------------------------------------------------
+    % `Ep` is treated as a column vector (all segments concatenated).
+    Ep = PEB.Ep(:);
+
+    % `Cp` may be an NxN covariance matrix or an Nx1 vector of marginal variances.
     Cp_all = PEB.Cp;
-    % Cp may be NxN covariance OR Nx1 vector of marginal variances
     if isvector(Cp_all)
         Cp_marginal = Cp_all(:);
     else
@@ -79,88 +105,51 @@ for k = 1:numel(bmaList)
         error('Cp length (%d) does not match Ep length (%d) in %s.', numel(Cp_marginal), numel(Ep), bmaFile);
     end
 
-    % ---- Normalize Pnames to match Ep length ----
+    % ---- Normalize Pnames to a single block (DO NOT expand) -------------------
+    % Keep Pnames as one covariate block (length nNames). Segment count is inferred
+    % from the ratio nEp/nNames; no duplication or "#k" collapsing is performed.
     Pnames = PEB.Pnames;
     if ischar(Pnames)
         Pnames = cellstr(Pnames);
-    end
-    if iscell(Pnames)
-        Pnames = Pnames(:);
-    else
+    elseif ~iscell(Pnames)
         try
             Pnames = cellstr(string(Pnames));
-            Pnames = Pnames(:);
         catch
             error('Pnames has unexpected type in %s.', bmaFile);
         end
     end
-
+    Pnames = Pnames(:);            % column cellstr
     nEp    = numel(Ep);
     nNames = numel(Pnames);
 
-    % If Ep contains repeated covariate blocks, expand Pnames by rewriting the
-    % "Covariate <j>:" prefix for each repetition (no "#k" suffix is appended).
-    if nNames > 0 && mod(nEp, nNames) == 0
-        reps = nEp / nNames;
-        if reps > 1
-            base = Pnames;                 % base labels (e.g., "Covariate 1: H(...)")
-            Pnames_rep = cell(nEp,1);
-            for j = 1:reps
-                idx = (j-1)*nNames + (1:nNames);
-                block = base;
-                % If there is an explicit "Covariate <num>:" prefix, rewrite it to j
-                hasCov = ~cellfun('isempty', regexp(block, '^(?i)\s*covariate\s+\d+\s*:'));
-                block(hasCov) = regexprep(block(hasCov), '^(?i)\s*covariate\s+\d+\s*:', sprintf('Covariate %d:', j));
-                % Otherwise, prepend a covariate prefix
-                block(~hasCov) = cellfun(@(s) sprintf('Covariate %d: %s', j, s), block(~hasCov), 'UniformOutput', false);
-                Pnames_rep(idx) = block;
-            end
-            Pnames = Pnames_rep;
-            nNames = numel(Pnames);
-            assert(nNames == nEp, 'Internal error: expanded Pnames length mismatch.');
-        end
+    % Segment inference: require that Ep length is a multiple of Pnames length.
+    if nNames == 0 || mod(nEp, nNames) ~= 0
+        error('Cannot infer segments: numel(Ep)=%d not a multiple of numel(Pnames)=%d in %s.', nEp, nNames, bmaFile);
     end
+    nSeg = nEp / nNames;
+    fprintf('  Inferred segments: nSeg = %d (nEp=%d, nNames=%d)\n', nSeg, nEp, nNames);
 
-    % If still mismatched, fail fast (do not fabricate labels silently)
-    if nNames ~= nEp
-        error('Pnames count (%d) != Ep count (%d) in %s after normalization. Refusing to fabricate labels.', nNames, nEp, bmaFile);
-    end
-
-    % Posterior probability
+    % Posterior probabilities under the normal model used by SPM
     Pp = 1 - spm_Ncdf(T, abs(Ep), Cp_marginal);
 
-    % Threshold (zero-out values below Pp threshold)
+    % Threshold: zero out Ep/Cp where Pp < threshold (lengths are preserved)
     mask  = (Pp >= threshold);
     EpThr = Ep;           EpThr(~mask) = 0;
     CpThr = Cp_marginal;  CpThr(~mask) = 0;
 
-    % Collapse duplicates that only differ by a trailing "#k" (e.g., "...#1", "...#2").
-    % This avoids duplicate edges per (covariate, ROI, src→dst) in downstream plots.
-    % Adjust `combineEp` if you prefer sum/max/first-nonzero instead of mean.
-    baseNames = regexprep(Pnames, '#\s*\d+\s*$', '');   % strip trailing #1/#2 if present
-    [uniqNames, ~, grp] = unique(baseNames, 'stable');
-
-    % Choose how to combine duplicates:
-    combineEp  = @(x) mean(x);   % alternatives: sum / max / first-nonzero
-    combinePp  = @(x) max(x);    % conservative: keep highest probability
-    combineCp  = @(x) max(x);    % conservative: keep largest retained variance
-
-    EpThr2 = accumarray(grp, EpThr, [], combineEp);
-    Pp2    = accumarray(grp, Pp,    [], combinePp);
-    CpThr2 = accumarray(grp, CpThr, [], combineCp);
-
-    % Struct array, one per parameter (all columns same length now)
+    % Save exactly what the Python plotter expects (segment-preserving layout)
     PEB_thresholded = struct( ...
-        'Ep',     num2cell(EpThr2(:)), ...
-        'Pp',     num2cell(Pp2(:)), ...
-        'Pnames', uniqNames(:), ...
-        'Cp',     num2cell(CpThr2(:)) );
+        'Ep',     EpThr, ...     % length nEp (concatenated segments)
+        'Pp',     Pp, ...        % length nEp
+        'Pnames', {Pnames}, ...  % length nNames (ONE block)
+        'Cp',     CpThr ...      % length nEp
+    );
 
-    % Report (raw count vs. unique after duplicate collapse)
-    fprintf('  Params (raw): %d | unique after collapse: %d | pass >=%.2f: %d | zeroed: %d\n', ...
-        numel(Pp), numel(Pp2), threshold, nnz(mask), nnz(~mask));
+    fprintf('  Thresholded: kept %d / %d params (Pp >= %.2f)\n', nnz(mask), numel(mask), threshold);
 
-    %% 5) Find Peb file for this token (best-effort), compute percentageCell (optional)
+    %% 5) (Optional) Pair to Peb_*.mat and compute percentageCell
+    % If a matching Peb file is found, compute per-covariate percentages of
+    % positive/negative/zero across Pebs; stored in `Results.percentageCell`.
     percentageCell = [];
     pebFile = findPebForToken(baseToken);
 
@@ -213,6 +202,7 @@ for k = 1:numel(bmaList)
     end
 
     %% 6) Save one output per BMA
+    % Primary output is `Results.PEB_thresholded` (segment-preserving).
     Results = struct('PEB_thresholded', PEB_thresholded);
     if ~isempty(percentageCell), Results.percentageCell = percentageCell; end
 
@@ -225,7 +215,7 @@ fprintf('\nDone. Wrote %d result files.\n', numel(bmaList));
 
 %% ------------ Local helpers ------------
 function pebFile = findPebForToken(baseToken)
-    % Return the best Peb_*.mat to pair with a given baseToken. Case-insensitive.
+    % Return the best Peb_*.mat to pair with a given baseToken (case-insensitive).
     pebFile = '';
     allPeb = dir('Peb_*.mat');
     if isempty(allPeb), return; end
