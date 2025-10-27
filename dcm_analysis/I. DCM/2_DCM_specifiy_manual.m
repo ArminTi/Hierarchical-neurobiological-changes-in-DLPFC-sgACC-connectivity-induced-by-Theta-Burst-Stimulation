@@ -81,8 +81,6 @@ for i = 1:length(files)
     [pE,pC] = spm_cmm_NMDA_priors(DCM.A,DCM.B,DCM.C);
     DCM.M.pE = pE; % prior
     DCM.M.pC = pC; % prior covarience
-    DCM.M.pE.G = sparse(length(DCM.Sname),10);
-    DCM.M.pC.G = sparse(length(DCM.Sname),10)+1/8;
     % Set state and observation equations
     DCM = spm_dcm_erp_dipfit(DCM, 1 );%% get lead field etc. for forward models
     % CSD data
@@ -104,4 +102,5 @@ end
 
 restoredefaultpath;
 fprintf('DCM specification completed for all files.\n');
+
 
