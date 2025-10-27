@@ -14,8 +14,9 @@ Available: https://doi.org/10.25452/figshare.plus.c.5910329
 Citation: Moffa, A. H. et al. Neuromodulatory effects of theta burst stimulation to the prefrontal cortex. Sci Data 9, 717 (2022).
 
 ## Step by Step Guide
-![gitfig4](https://github.com/user-attachments/assets/92b085ef-70bc-48fb-b166-4eb0064c9236)
+![gitfig5](https://github.com/user-attachments/assets/10dbe7a5-c7eb-4dff-bbf6-67d378012862)
 -->
+
 
 <!--
 ![alt text](gitfig4.svg)
