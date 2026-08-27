@@ -1,4 +1,5 @@
 
+%% This code is a modified version of code published with Moffa et al., 2022 %%
 
 %% Add paths to toolboxes/dependencies
 restoredefaultpath
