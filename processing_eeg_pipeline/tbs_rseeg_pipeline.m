@@ -1,5 +1,7 @@
 
 %% This code is a modified version of code published with Moffa et al., 2022 %%
+%% Link to the original one: https://plus.figshare.com/collections/Dataset_supporting_the_study_Neuromodulatory_effects_of_theta-burst_stimulation_of_the_prefrontal_cortex_using_TMS-EEG_/5910329
+
 
 %% Add paths to toolboxes/dependencies
 restoredefaultpath
